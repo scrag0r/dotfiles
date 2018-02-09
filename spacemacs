@@ -46,6 +46,7 @@ values."
             )
      emacs-lisp
      semantic
+     shell-scripts
      ;; pdf-tools
      ;; git
      (latex :variables
@@ -54,14 +55,16 @@ values."
             )
      ;; markdown
      ;; org
-     python
+     (python :varibales
+             python-test-runner 'pytest)
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
      spell-checking
-     syntax-checkin
+     syntax-checking
      (version-control :varibales
-                      version-control-diff-tool 'git-gutter)
+                      version-control-diff-tool 'git-gutter
+                      )
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -103,7 +106,7 @@ values."
    ;; when the current branch is not `develop'. Note that checking for
    ;; new versions works via git commands, thus it calls GitHub services
    ;; whenever you start Emacs. (default nil)
-   dotspacemacs-check-for-update nil
+   dotspacemacs-check-for-update t
    ;; If non-nil, a form that evaluates to a package directory. For example, to
    ;; use different package directories for different Emacs versions, set this
    ;; to `emacs-version'.
@@ -329,12 +332,17 @@ you should place your code here."
                                 '("latexmk" "latexmk -pdf %s" TeX-run-TeX nil t
                                   :help "Run latexmk on file")
                                 TeX-command-list)))
-
-  (setq python-shell-interpreter "/home/scrag0r/anaconda3/bin/python3")
-  (setq python-shell-interpreter-args "-m IPython --simple-prompt -i")
+  ;; Python
+  (setq python-shell-interpreter "/opt/anaconda3/bin/python3")
+  (setq python-shell-interpreter-args "-m IPython --simple-prompt --pylab -i")
   (add-hook 'python-mode-hook (lambda ()
                                 (require 'sphinx-doc)
-                                (sphinx-doc-mode t)))
+                                (sphinx-doc-mode t)
+                                ))
+  ;; set python path variables
+  (with-eval-after-load 'anaconda-mode
+    (add-to-list 'python-shell-extra-pythonpaths (projectile-project-root))
+    )
 
   (setq debug-on-error t)
   )
@@ -348,7 +356,7 @@ you should place your code here."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-commit with-editor git-gutter diff-hl sphinx-doc yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode company-anaconda anaconda-mode pythonic org-ref key-chord ivy helm-bibtex parsebib biblio biblio-core stickyfunc-enhance srefactor disaster company-c-headers cmake-mode clang-format flycheck-pos-tip pos-tip flycheck flyspell-correct-helm flyspell-correct auto-dictionary auctex-latexmk pdf-tools tablist helm-company helm-c-yasnippet fuzzy company-statistics company-auctex company auto-yasnippet yasnippet auctex ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+    (insert-shebang fish-mode company-shell git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-commit with-editor git-gutter diff-hl sphinx-doc yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode company-anaconda anaconda-mode pythonic org-ref key-chord ivy helm-bibtex parsebib biblio biblio-core stickyfunc-enhance srefactor disaster company-c-headers cmake-mode clang-format flycheck-pos-tip pos-tip flycheck flyspell-correct-helm flyspell-correct auto-dictionary auctex-latexmk pdf-tools tablist helm-company helm-c-yasnippet fuzzy company-statistics company-auctex company auto-yasnippet yasnippet auctex ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
  '(paradox-github-token t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
