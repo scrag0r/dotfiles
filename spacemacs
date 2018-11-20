@@ -31,13 +31,16 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     windows-scripts
+     yaml
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      helm
-     auto-completion
+     (auto-completion :variables
+                      auto-completion-enable-snippets-in-popup t)
      bibtex
      ;; better-defaults
      (c-c++ :variables
@@ -45,21 +48,22 @@ values."
             c-c++-enable-clang-support t
             )
      emacs-lisp
-     semantic
-     shell-scripts
-     ;; pdf-tools
      ;; git
+     ipython-notebook
      (latex :variables
             latex-build-command "LatexMk"
             latex-enable-auto-fill t
             )
      ;; markdown
      org
+     ;; pdf-tools
      (python :varibales
              python-test-runner 'pytest)
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
+     semantic
+     shell-scripts
      spell-checking
      syntax-checking
      (version-control :varibales
@@ -70,11 +74,12 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(sphinx-doc)
+   dotspacemacs-additional-packages '(yasnippet-snippets)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '()
+   ;; Workaround since evil-ediff was removed from MELPA
+   dotspacemacs-excluded-packages '(evil-ediff) 
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and uninstall any
@@ -334,17 +339,37 @@ you should place your code here."
                                 TeX-command-list)))
   
   ;; Python
-  (setq python-shell-interpreter "/opt/anaconda3/bin/python3")
+  (setq python-shell-interpreter "/local/home/baum_ad/anaconda3/bin/python3")
   (setq python-shell-interpreter-args "-m IPython --simple-prompt --pylab -i")
   
+  (defun python-new-shell-send-buffer ()
+    "Restart python console before evaluate buffer or region to avoid various 
+uncanny conflicts, like not reloding modules even when they are changed"
+    (interactive)
+    (ignore-errors
+      (let ((bn (buffer-name)))
+        (set-buffer "*Python*")
+        (comint-clear-buffer)
+        (set-buffer bn)))
+    (ignore-errors
+      (kill-process "Python"))
+    (sleep-for 0.15)
+    (run-python)
+    (sleep-for 1)
+    (python-shell-send-buffer)
+    ;; (switch-to-buffer-other-window "*Python*")
+    )
+
   ;; set python path variables
   (with-eval-after-load 'anaconda-mode
     (add-to-list 'python-shell-extra-pythonpaths (projectile-project-root))
     )
   
-  (setenv "WORKON_HOME" "/opt/anaconda3/envs")
+  (setenv "WORKON_HOME" (expand-file-name "~/anaconda3/envs"))
 
-  (setq debug-on-error t)
+  (put 'helm-make-build-dir 'safe-local-variable 'stringp)
+
+  (setq debug-on-error nil)
 
   (add-hook 'prog-mode-hook 'turn-on-fci-mode)
   (add-hook 'text-mode-hook 'turn-on-fci-mode)
@@ -359,7 +384,7 @@ you should place your code here."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (org-mime org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download htmlize gnuplot insert-shebang fish-mode company-shell git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-commit with-editor git-gutter diff-hl sphinx-doc yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode company-anaconda anaconda-mode pythonic org-ref key-chord ivy helm-bibtex parsebib biblio biblio-core stickyfunc-enhance srefactor disaster company-c-headers cmake-mode clang-format flycheck-pos-tip pos-tip flycheck flyspell-correct-helm flyspell-correct auto-dictionary auctex-latexmk pdf-tools tablist helm-company helm-c-yasnippet fuzzy company-statistics company-auctex company auto-yasnippet yasnippet auctex ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+    (ein skewer-mode request-deferred websocket deferred js2-mode simple-httpd powershell yasnippet-snippets yaml-mode org-mime org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download htmlize gnuplot insert-shebang fish-mode company-shell git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-commit with-editor git-gutter diff-hl sphinx-doc yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode company-anaconda anaconda-mode pythonic org-ref key-chord ivy helm-bibtex parsebib biblio biblio-core stickyfunc-enhance srefactor disaster company-c-headers cmake-mode clang-format flycheck-pos-tip pos-tip flycheck flyspell-correct-helm flyspell-correct auto-dictionary auctex-latexmk pdf-tools tablist helm-company helm-c-yasnippet fuzzy company-statistics company-auctex company auto-yasnippet yasnippet auctex ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
  '(paradox-github-token t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
