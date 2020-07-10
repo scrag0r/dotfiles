@@ -76,8 +76,6 @@ This function should only modify configuration layer settings."
      (python :variables
              python-backend 'anaconda
              python-formatter 'yapf
-             ;; python-lsp-server 'mspyls
-             ;; python-lsp-git-root (file-truename "~/SoftwareProjects/python-language-server")
              )
      (conda :variables conda-anaconda-home "/local/home/baum_ad/anaconda3/")
      (shell :variables
@@ -517,9 +515,6 @@ before packages are loaded."
             #'TeX-revert-document-buffer)
 
   ;; Python
-  ;; (setq python-shell-interpreter "/local/home/baum_ad/anaconda3/bin/python3")
-  ;; (setq python-shell-interpreter-args "-m IPython --simple-prompt --pylab -i")
-
   (defun python-new-shell-send-buffer ()
     "Restart python console before evaluate buffer or region to avoid various
 uncanny conflicts, like not reloding modules even when they are changed"
