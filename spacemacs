@@ -33,61 +33,81 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(html
-     typescript
-     javascript
-     csv
+   '(
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     helm
      (auto-completion :variables
                       auto-completion-return-key-behavior 'complete
-                      auto-completion-enable-snippets-in-popup t)
+                      auto-completion-idle-delay 0.1
+                      ;; spacemacs-default-company-backends '(company-capf company-files)
+                      ;; auto-completion-enable-snippets-in-popup t
+                      )
      bibtex
-     ;; better-defaults
      (c-c++ :variables
+            ccls-executable
+            (file-truename "~/SoftwareProjects/ccls/Release/ccls")
             c-c++-default-mode-for-headers 'c++-mode
             c-c++-adopt-subprojects t
             c-c++-backend 'lsp-ccls
-            ccls-executable (file-truename "~/SoftwareProjects/ccls/Release/ccls")
-            c-c++-lsp-sem-highlight-method "font-lock"
+            c-c++-lsp-enable-semantic-highlight 'font-lock
             clang-format-style "file"
             ;; c-c++-enable-clang-support t
             )
+     ;; better-defaults
      (cmake :variables cmake-enable-cmake-ide-support t)
+     csv
      command-log
-     dap
+     ;; dap
      emacs-lisp
      git
+     helm
+     html
      ipython-notebook
      (latex :variables
+            ;; latex-backend 'lsp
+            latex-backend 'company-auctex
             latex-build-command "LatexMk"
             latex-enable-auto-fill t
             )
-     lsp
+     (lsp
+      :variables
+      ;; lsp-lens-enable t
+      )
      markdown
-     multiple-cursors
+     ;; multiple-cursors
      neotree
-     org
+     (org :variables
+          org-want-todo-bindings t
+          org-enable-roam-support t
+          )
+     org-roam-bibtex
      pdf
+     ;; php
      (python :variables
-             python-backend 'anaconda
+             python-backend 'lsp
+             python-lsp-server 'pyright
              python-formatter 'yapf
              )
-     (conda :variables conda-anaconda-home "/local/home/baum_ad/anaconda3/")
+     ;; (python :variables
+     ;;         python-backend 'anaconda
+     ;;         python-formatter 'yapf
+     ;;         )
+     (conda :variables conda-anaconda-home (file-truename "~/anaconda3/"))
      (shell :variables
             shell-default-shell 'ansi-term
             shell-default-height 30
             shell-default-position 'bottom)
-     semantic
+     ;; semantic
      shell-scripts
      spell-checking
      syntax-checking
+     ;; themes-megapack
      treemacs
-     typescript
+     ;; typescript
+     ;; javascript
      (version-control :varibales
                       version-control-diff-tool 'git-gutter
                       )
@@ -102,7 +122,12 @@ This function should only modify configuration layer settings."
    ;; To use a local version of a package, use the `:location' property:
    ;; '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '(yasnippet-snippets exec-path-from-shell (ox-mediawiki :location local))
+   dotspacemacs-additional-packages '(exec-path-from-shell
+                                      org-noter
+                                      org-pdftools
+                                      (ox-mediawiki :location local)
+                                      yasnippet-snippets
+                                      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
 
@@ -132,18 +157,18 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil)
    dotspacemacs-enable-emacs-pdumper nil
 
-   ;; File path pointing to emacs 27.1 executable compiled with support
-   ;; for the portable dumper (this is currently the branch pdumper).
-   ;; (default "emacs-27.0.50")
+   ;; Name of executable file pointing to emacs 27+. This executable must be
+   ;; in your PATH.
+   ;; (default "emacs")
    dotspacemacs-emacs-pdumper-executable-file "emacs"
 
    ;; Name of the Spacemacs dump file. This is the file will be created by the
    ;; portable dumper in the cache directory under dumps sub-directory.
    ;; To load it when starting Emacs add the parameter `--dump-file'
    ;; when invoking Emacs 27.1 executable on the command line, for instance:
-   ;;   ./emacs --dump-file=~/.emacs.d/.cache/dumps/spacemacs.pdmp
-   ;; (default spacemacs.pdmp)
-   dotspacemacs-emacs-dumper-dump-file "spacemacs.pdmp"
+   ;;   ./emacs --dump-file=$HOME/.emacs.d/.cache/dumps/spacemacs-27.1.pdmp
+   ;; (default (format "spacemacs-%s.pdmp" emacs-version))
+   dotspacemacs-emacs-dumper-dump-file (format "spacemacs-%s.pdmp" emacs-version)
 
    ;; If non-nil ELPA repositories are contacted via HTTPS whenever it's
    ;; possible. Set it to nil if you have no way to use HTTPS in your
@@ -163,19 +188,30 @@ It should only modify the values of Spacemacs settings."
    ;; (default '(100000000 0.1))
    dotspacemacs-gc-cons '(100000000 0.1)
 
+   ;; Set `read-process-output-max' when startup finishes.
+   ;; This defines how much data is read from a foreign process.
+   ;; Setting this >= 1 MB should increase performance for lsp servers
+   ;; in emacs 27.
+   ;; (default (* 1024 1024))
+   dotspacemacs-read-process-output-max (* 1024 1024)
+
    ;; If non-nil then Spacelpa repository is the primary source to install
    ;; a locked version of packages. If nil then Spacemacs will install the
-   ;; latest version of packages from MELPA. (default nil) dotspacemacs-use-spacelpa nil
+   ;; latest version of packages from MELPA. Spacelpa is currently in
+   ;; experimental state please use only for testing purposes.
+   ;; (default nil)
+   dotspacemacs-use-spacelpa nil
 
    ;; If non-nil then verify the signature for downloaded Spacelpa archives.
-   ;; (default nil)
-   dotspacemacs-verify-spacelpa-archives nil
+   ;; (default t)
+   dotspacemacs-verify-spacelpa-archives t
 
    ;; If non-nil then spacemacs will check for updates at startup
    ;; when the current branch is not `develop'. Note that checking for
    ;; new versions works via git commands, thus it calls GitHub services
    ;; whenever you start Emacs. (default nil)
-   dotspacemacs-check-for-update t
+   dotspacemacs-check-for-update nil
+
    ;; If non-nil, a form that evaluates to a package directory. For example, to
    ;; use different package directories for different Emacs versions, set this
    ;; to `emacs-version'. (default 'emacs-version)
@@ -189,8 +225,10 @@ It should only modify the values of Spacemacs settings."
    ;; (default 'vim)
    dotspacemacs-editing-style 'vim
 
-   ;; If non-nil output loading progress in `*Messages*' buffer. (default nil)
-   dotspacemacs-verbose-loading nil
+   ;; If non-nil show the version string in the Spacemacs buffer. It will
+   ;; appear as (spacemacs version)@(emacs version)
+   ;; (default t)
+   dotspacemacs-startup-buffer-show-version t
 
    ;; Specify the startup banner. Default value is `official', it displays
    ;; the official spacemacs logo. An integer value is the index of text
@@ -203,14 +241,23 @@ It should only modify the values of Spacemacs settings."
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
    ;; Possible values for list-type are:
-   ;; `recents' `bookmarks' `projects' `agenda' `todos'.
+   ;; `recents' `recents-by-project' `bookmarks' `projects' `agenda' `todos'.
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
+   ;; The exceptional case is `recents-by-project', where list-type must be a
+   ;; pair of numbers, e.g. `(recents-by-project . (7 .  5))', where the first
+   ;; number is the project limit and the second the limit on the recent files
+   ;; within a project.
    dotspacemacs-startup-lists '((recents . 5)
                                 (projects . 7))
 
    ;; True if the home buffer should respond to resize events. (default t)
    dotspacemacs-startup-buffer-responsive t
+
+   ;; Default major mode for a new empty buffer. Possible values are mode
+   ;; names such as `text-mode'; and `nil' to use Fundamental mode.
+   ;; (default `text-mode')
+   dotspacemacs-new-empty-buffer-major-mode 'text-mode
 
    ;; Default major mode of the scratch buffer (default `text-mode')
    dotspacemacs-scratch-mode 'text-mode
@@ -222,8 +269,7 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(spacemacs-dark
-                         spacemacs-light)
+   dotspacemacs-themes '(spacemacs-dark spacemacs-light)
 
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
@@ -233,13 +279,15 @@ It should only modify the values of Spacemacs settings."
    ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
    dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.5)
+   ;; dotspacemacs-mode-line-theme '(doom)
 
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
 
-   ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
-   ;; quickly tweak the mode-line size to make separators look not too crappy.
+   ;; Default font or prioritized list of fonts. The `:size' can be specified as
+   ;; a non-negative integer (pixel size), or a floating-point (point size).
+   ;; Point size is recommended, because it's device independent. (default 10.0)
    dotspacemacs-default-font '("Source Code Pro"
                                :size 13
                                :weight normal
@@ -264,8 +312,10 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-major-mode-leader-key ","
 
    ;; Major mode leader key accessible in `emacs state' and `insert state'.
-   ;; (default "C-M-m")
-   dotspacemacs-major-mode-emacs-leader-key "C-M-m"
+   ;; (default "C-M-m" for terminal mode, "<M-return>" for GUI mode).
+   ;; Thus M-RET should work as leader key in both GUI and terminal modes.
+   ;; C-M-m also should work in terminal mode, but not in GUI mode.
+   dotspacemacs-major-mode-emacs-leader-key (if window-system "<M-return>" "C-M-m")
 
    ;; These variables control whether separate commands are bound in the GUI to
    ;; the key pairs `C-i', `TAB' and `C-m', `RET'.
@@ -344,6 +394,11 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil) (Emacs 24.4+ only)
    dotspacemacs-maximized-at-startup t
 
+   ;; If non-nil the frame is undecorated when Emacs starts up. Combine this
+   ;; variable with `dotspacemacs-maximized-at-startup' in OSX to obtain
+   ;; borderless fullscreen. (default nil)
+   dotspacemacs-undecorated-at-startup nil
+
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's active or selected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
@@ -371,10 +426,14 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-smooth-scrolling t
 
    ;; Control line numbers activation.
-   ;; If set to `t' or `relative' line numbers are turned on in all `prog-mode' and
-   ;; `text-mode' derivatives. If set to `relative', line numbers are relative.
+   ;; If set to `t', `relative' or `visual' then line numbers are enabled in all
+   ;; `prog-mode' and `text-mode' derivatives. If set to `relative', line
+   ;; numbers are relative. If set to `visual', line numbers are also relative,
+   ;; but lines are only visual lines are counted. For example, folded lines
+   ;; will not be counted and wrapped lines are counted as multiple lines.
    ;; This variable can also be set to a property list for finer control:
    ;; '(:relative nil
+   ;;   :visual nil
    ;;   :disabled-for-modes dired-mode
    ;;                       doc-view-mode
    ;;                       markdown-mode
@@ -382,16 +441,15 @@ It should only modify the values of Spacemacs settings."
    ;;                       pdf-view-mode
    ;;                       text-mode
    ;;   :size-limit-kb 1000)
+   ;; When used in a plist, `visual' takes precedence over `relative'.
    ;; (default nil)
    dotspacemacs-line-numbers '(:relative t
                                :disabled-for-modes dired-mode
                                                    doc-view-mode
-                                                   markdown-mode
-                                                   org-mode
                                                    pdf-view-mode
                                :size-limit-kb 1000)
 
-   ;; Code folding method. Possible values are `evil' and `origami'.
+   ;; Code folding method. Possible values are `evil', `origami' and `vimish'.
    ;; (default 'evil)
    dotspacemacs-folding-method 'evil
 
@@ -400,7 +458,7 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-smartparens-strict-mode nil
 
    ;; If non-nil pressing the closing parenthesis `)' key in insert mode passes
-   ;; over any automatically added closing parenthesis, bracket, quote, etc…
+   ;; over any automatically added closing parenthesis, bracket, quote, etc...
    ;; This can be temporary disabled by pressing `C-q' before `)'. (default nil)
    dotspacemacs-smart-closing-parenthesis nil
 
@@ -459,6 +517,20 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil)
    dotspacemacs-whitespace-cleanup nil
 
+   ;; If non nil activate `clean-aindent-mode' which tries to correct
+   ;; virtual indentation of simple modes. This can interfer with mode specific
+   ;; indent handling like has been reported for `go-mode'.
+   ;; If it does deactivate it here.
+   ;; (default t)
+   dotspacemacs-use-clean-aindent-mode t
+
+   ;; If non-nil shift your number row to match the entered keyboard layout
+   ;; (only in insert state). Currently supported keyboard layouts are:
+   ;; `qwerty-us', `qwertz-de' and `querty-ca-fr'.
+   ;; New layouts can be added in `spacemacs-editing' layer.
+   ;; (default nil)
+   dotspacemacs-swap-number-row nil
+
    ;; Either nil or a number of seconds. If non-nil zone out after the specified
    ;; number of seconds. (default nil)
    dotspacemacs-zone-out-when-idle nil
@@ -466,7 +538,14 @@ It should only modify the values of Spacemacs settings."
    ;; Run `spacemacs/prettify-org-buffer' when
    ;; visiting README.org files of Spacemacs.
    ;; (default nil)
-   dotspacemacs-pretty-docs nil))
+   dotspacemacs-pretty-docs nil
+
+   ;; If nil the home buffer shows the full path of agenda items
+   ;; and todos. If non nil only the file name is shown.
+   dotspacemacs-home-shorten-agenda-source nil
+
+   ;; If non-nil then byte-compile some of Spacemacs files.
+   dotspacemacs-byte-compile nil))
 
 (defun dotspacemacs/user-env ()
   "Environment variables setup.
@@ -498,11 +577,27 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
-  
+
   (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize)) 
+    (exec-path-from-shell-initialize))
 
   ;; TeX
+  (setq org-ref-default-bibliography
+        `(,(file-truename "~/Paper/bibliography/bibliography.bib"))
+        org-ref-pdf-directory (file-truename "~/Paper/bibliography/papers/")
+        )
+
+  (setq reftex-default-bibliography
+        `(,(file-truename "~/Paper/bibliography/bibliography.bib")))
+
+  (setq bibtex-completion-bibliography
+        '("/local/home/baum_ad/Paper/bibliography/bibliography.bib"))
+
+  (setq bibtex-completion-library-path
+        '("/local/home/baum_ad/Paper/bibliography/papers"))
+
+  (setq bibtex-completion-notes-path "/local/home/baum_ad/org/roam/")
+
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
 
   (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
@@ -510,11 +605,24 @@ before packages are loaded."
         TeX-source-correlate-start-server t
         )
 
+  (spacemacs/set-leader-keys-for-major-mode 'latex-mode "oc"
+    'org-ref-helm-insert-cite-link)
+
   ;; update document buffer after compilation
   (add-hook 'TeX-after-compilation-finished-functions
-            #'TeX-revert-document-buffer)
+            'TeX-revert-document-buffer)
+  (setq-default whitespace-style '(face trailing))
+  (add-hook 'LaTeX-mode-hook 'whitespace-mode)
 
   ;; Python
+  (setq python-shell-interpreter "/local/home/baum_ad/anaconda3/bin/python3")
+  (setq python-shell-interpreter-args "-m IPython --simple-prompt --pylab -i")
+
+  ;; (spacemacs/set-leader-keys-for-major-mode 'inferior-python-mode "hh"
+  ;;   'anaconda-mode-show-doc)
+
+  ;; (add-hook 'inferior-python-mode-hook 'anaconda-mode)
+
   (defun python-new-shell-send-buffer ()
     "Restart python console before evaluate buffer or region to avoid various
 uncanny conflicts, like not reloding modules even when they are changed"
@@ -538,8 +646,8 @@ uncanny conflicts, like not reloding modules even when they are changed"
 
   ;; (setenv "WORKON_HOME" (expand-file-name "~/anaconda3"))
 
-  (setq-default lsp-pyls-configuration-sources ["flake8"])
-  (setq-default lsp-pyls-plugins-pylint-enabled nil)
+  ;; (setq-default lsp-pyls-configuration-sources ["flake8"])
+  ;; (setq-default lsp-pyls-plugins-pylint-enabled nil)
 
   ;; Git
   (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
@@ -556,30 +664,63 @@ uncanny conflicts, like not reloding modules even when they are changed"
 
   ;; org-mode
   (require 'ox-mediawiki)
+  (setq org-todo-keywords
+        '((sequence "TODO(t!)"
+                    "NEXT(n!)"
+                    "DOINGNOW(d!)"
+                    "BLOCKED(b!)"
+                    "TODELEGATE(g!)"
+                    "DELEGATED(D!)"
+                    "FOLLOWUP(f!)"
+                    "TICKLE(T!)"
+                    "|"
+                    "CANCELLED(c!)"
+                    "DONE(F!)")))
 
-  (setq org-ref-default-bibliography
-        '("/local/home/baum_ad/Paper/bibliography/bibliography.bib")
-        org-ref-pdf-directory "/local/home/baum_ad/Paper/bibliography/papers/")
+  (setq org-todo-keyword-faces
+        '(("TODO" . org-warning)
+          ("DOINGNOW" . "#E35DBF")
+          ("CANCELED" . (:foreground "white" :background "#4d4d4d" :weight bold))
+          ("DELEGATED" . "pink")
+          ("NEXT" . "#008080")))
+
+  (setq org-roam-directory "/local/home/baum_ad/org/roam/")
+  (setq org-roam-index-file "/local/home/baum_ad/org/roam/index.org")
+  (setq org-noter-notes-search-path `(,(file-truename "~/org/roam")))
+  (require 'org-roam-protocol)
+  (setq org-roam-completion-everywhere t)
+
+
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "on" 'org-noter)
+
+  ;; Use pdf-tools and no external apps
+  ;; https://github.com/jkitchin/org-ref/blob/master/org-ref.org
+  (delete '("\\.pdf\\'" . default) org-file-apps)
+  (add-to-list 'org-file-apps
+		           '("\\.pdf\\'" . (lambda (file link)
+				                         (org-pdftools-open link))))
 
   ;; flycheck
   (spacemacs/set-leader-keys "Sh" 'flyspell-correct-at-point)
 
-  ;; From https://unconj.ca/blog/linting-prose-in-emacs.html
-  ;; conda install -c conda-forge proselint
-  ;; (flycheck-define-checker proselint
-  ;;   "A linter for prose."
-  ;;   :command ("proselint" source-inplace)
-  ;;   :error-patterns
-  ;;   ((warning line-start (file-name) ":" line ":" column ": "
-  ;;             (id (one-or-more (not (any " "))))
-  ;;             (message) line-end))
-  ;;   :modes (text-mode markdown-mode gfm-mode org-mode))
+  (add-to-list 'flycheck-global-modes 'latex-mode)
 
-  ;; (add-to-list 'flycheck-checkers 'proselint)
+  ;; fill column indicator
+  (add-hook 'org-mode-hook 'display-fill-column-indicator-mode)
+  (add-hook 'python-mode-hook 'display-fill-column-indicator-mode)
+  (add-hook 'LaTeX-mode-hook 'display-fill-column-indicator-mode)
+  (add-hook 'c++-mode-hook 'display-fill-column-indicator-mode)
+  (add-hook 'emacs-lisp-mode-hook 'display-fill-column-indicator-mode)
+  (add-hook 'text-mode-hook 'display-fill-column-indicator-mode)
+  (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)
+  (add-hook 'bibtex-mode-hook 'display-fill-column-indicator-mode)
+  ;; (global-display-fill-column-indicator-mode t)
 
   ;; Misc
-  (add-hook 'prog-mode-hook 'turn-on-fci-mode)
-  (add-hook 'text-mode-hook 'turn-on-fci-mode)
+  (global-undo-tree-mode t)
+
+  (setq recentf-keep '(file-remote-p file-readable-p))
+  (setq recentf-exclude '("/users/", "/groups/", "/ushelf/", "/eocopfs01/"))
 
   (setq debug-on-error nil)
 
@@ -589,12 +730,24 @@ uncanny conflicts, like not reloding modules even when they are changed"
       (setq tmp (replace-regexp-in-string "\n" " " tmp))
       (setq tmp (replace-regexp-in-string "^[ \t]+" "" tmp))
       (setq tmp (replace-regexp-in-string "[ \t]+$" "" tmp))
+      (setq tmp (replace-regexp-in-string "[ ]+" " " tmp))
       (kill-new tmp)
       (deactivate-mark)
       )
     )
   (spacemacs/declare-prefix "o" "own-menu")
   (spacemacs/set-leader-keys "oy" 'yank-crop)
+  (spacemacs/set-leader-keys "ob" 'helm-bibtex)
+  (spacemacs/set-leader-keys "on" 'helm-bibtex-with-notes)
+  (spacemacs/set-leader-keys "os" 'org-save-all-org-buffers)
+  (spacemacs/set-leader-keys "oi" 'helm-org-agenda-files-headings)
+
+  ;; (setq jit-lock-defer-time 0)
+  ;; (setq fast-but-imprecise-scrolling t)
+
+  (setq doom-modeline-buffer-file-name-style 'buffer-name)
+  ;; (setq doom-modeline-persp-name nil)
+  (setq doom-modeline-display-default-persp-name t)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -610,20 +763,16 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   (quote
-    ("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default)))
+   '("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default))
  '(evil-want-Y-yank-to-eol nil)
- '(org-agenda-files (quote ("~/tasks.org")))
+ '(org-agenda-files '("~/Projects/Enmap/enmapcs.org" "~/tasks.org"))
  '(package-selected-packages
-   (quote
-    (mmm-mode markdown-toc gh-md command-log-mode robe rbenv rake ocp-indent ob-elixir mvn minitest meghanada maven-test-mode lsp-java groovy-mode groovy-imports pcache gradle-mode flycheck-ocaml merlin flycheck-mix flycheck-credo emojify emoji-cheat-sheet-plus dune company-emoji chruby bundler inf-ruby auto-complete-rst alchemist elixir-mode treemacs-magit smeargle orgit magit-svn magit-section magit-gitflow magit-popup helm-gitignore helm-git-grep gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link evil-magit magit transient web-mode tagedit slim-mode scss-mode sass-mode pug-mode impatient-mode helm-css-scss haml-mode counsel-css company-web web-completion-data treemacs-projectile treemacs-evil lsp-treemacs ansi package-build shut-up git commander tide import-js grizzl emmet-mode add-node-modules-path yasnippet-snippets yapfify yaml-mode xterm-color ws-butler winum web-beautify volatile-highlights vi-tilde-fringe uuidgen toc-org symon string-inflection stickyfunc-enhance srefactor spaceline-all-the-icons spaceline powerline shell-pop restart-emacs rainbow-delimiters pytest pyenv-mode py-isort prettier-js powershell popwin pippel pipenv pyvenv pip-requirements persp-mode password-generator paradox overseer org-ref pdf-tools key-chord tablist org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-bullets org-brain open-junk-file ob-ipython neotree nameless multi-term move-text macrostep lsp-ui lsp-python lsp-javascript-typescript typescript-mode lorem-ipsum livid-mode live-py-mode link-hint json-navigator hierarchy json-mode json-snatcher json-reformat js2-refactor multiple-cursors js-doc insert-shebang indent-guide importmagic epc ctable concurrent hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-xref helm-themes helm-swoop helm-rtags helm-pydoc helm-purpose window-purpose imenu-list helm-projectile helm-org-rifle helm-mode-manager helm-make helm-flx helm-descbinds helm-company helm-c-yasnippet helm-bibtex parsebib helm-ag google-translate google-c-style golden-ratio gnuplot git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-commit with-editor git-gutter fuzzy flyspell-correct-helm flyspell-correct flycheck-rtags flycheck-pos-tip pos-tip flycheck-bashate flycheck flx-ido flx fish-mode fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state iedit evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens smartparens paredit evil-args evil-anzu anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav ein skewer-mode polymode deferred request websocket js2-mode simple-httpd editorconfig dumb-jump doom-modeline shrink-path all-the-icons memoize disaster diff-hl define-word cython-mode csv-mode cquery counsel-projectile counsel swiper ivy company-tern tern company-statistics company-shell company-rtags rtags company-lsp company-c-headers company-auctex company-anaconda company column-enforce-mode clean-aindent-mode clang-format centered-cursor-mode ccls projectile lsp-mode markdown-mode spinner ht dash-functional pkg-info epl browse-at-remote biblio biblio-core auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed auctex-latexmk auctex anaconda-mode pythonic f dash s aggressive-indent ace-window ace-link ace-jump-helm-line helm avy helm-core ac-ispell auto-complete popup which-key use-package pcre2el org-plus-contrib hydra lv font-lock+ evil goto-chg undo-tree dotenv-mode diminish bind-map bind-key async)))
+   '(phpunit phpcbf php-extras php-auto-yasnippets helm-gtags ggtags geben drupal-mode cfrs counsel-gtags company-phpactor phpactor composer php-runtime company-php ac-php-core xcscope php-mode dap-mode posframe bui mmm-mode markdown-toc gh-md command-log-mode robe rbenv rake ocp-indent ob-elixir mvn minitest meghanada maven-test-mode lsp-java groovy-mode groovy-imports pcache gradle-mode flycheck-ocaml merlin flycheck-mix flycheck-credo emojify emoji-cheat-sheet-plus dune company-emoji chruby bundler inf-ruby auto-complete-rst alchemist elixir-mode treemacs-magit smeargle orgit magit-svn magit-section magit-gitflow magit-popup helm-gitignore helm-git-grep gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link evil-magit magit transient web-mode tagedit slim-mode scss-mode sass-mode pug-mode impatient-mode helm-css-scss haml-mode counsel-css company-web web-completion-data treemacs-projectile treemacs-evil lsp-treemacs ansi package-build shut-up git commander tide import-js grizzl emmet-mode add-node-modules-path yasnippet-snippets yapfify yaml-mode xterm-color ws-butler winum web-beautify volatile-highlights vi-tilde-fringe uuidgen toc-org symon string-inflection stickyfunc-enhance srefactor spaceline-all-the-icons spaceline powerline shell-pop restart-emacs rainbow-delimiters pytest pyenv-mode py-isort prettier-js powershell popwin pippel pipenv pyvenv pip-requirements persp-mode password-generator paradox overseer org-ref pdf-tools key-chord tablist org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-bullets org-brain open-junk-file ob-ipython neotree nameless multi-term move-text macrostep lsp-ui lsp-python lsp-javascript-typescript typescript-mode lorem-ipsum livid-mode live-py-mode link-hint json-navigator hierarchy json-mode json-snatcher json-reformat js2-refactor multiple-cursors js-doc insert-shebang indent-guide importmagic epc ctable concurrent hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-xref helm-themes helm-swoop helm-rtags helm-pydoc helm-purpose window-purpose imenu-list helm-projectile helm-org-rifle helm-mode-manager helm-make helm-flx helm-descbinds helm-company helm-c-yasnippet helm-bibtex parsebib helm-ag google-translate google-c-style golden-ratio gnuplot git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-commit with-editor git-gutter fuzzy flyspell-correct-helm flyspell-correct flycheck-rtags flycheck-pos-tip pos-tip flycheck-bashate flycheck flx-ido flx fish-mode fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state iedit evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens smartparens paredit evil-args evil-anzu anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav ein skewer-mode polymode deferred request websocket js2-mode simple-httpd editorconfig dumb-jump doom-modeline shrink-path all-the-icons memoize disaster diff-hl define-word cython-mode csv-mode cquery counsel-projectile counsel swiper ivy company-tern tern company-statistics company-shell company-rtags rtags company-lsp company-c-headers company-auctex company-anaconda company column-enforce-mode clean-aindent-mode clang-format centered-cursor-mode ccls projectile lsp-mode markdown-mode spinner ht dash-functional pkg-info epl browse-at-remote biblio biblio-core auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed auctex-latexmk auctex anaconda-mode pythonic f dash s aggressive-indent ace-window ace-link ace-jump-helm-line helm avy helm-core ac-ispell auto-complete popup which-key use-package pcre2el org-plus-contrib hydra lv font-lock+ evil goto-chg undo-tree dotenv-mode diminish bind-map bind-key async))
  '(safe-local-variable-values
-   (quote
-    ((eval setq compile-command (concat "cd "
+   '((eval setq compile-command
+           (concat "cd "
                    (projectile-project-root)
-                   "build && make"))
-     (javascript-backend . tern)
-     (javascript-backend . lsp)))))
+                   "build && make")))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
