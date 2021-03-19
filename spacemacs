@@ -690,7 +690,6 @@ uncanny conflicts, like not reloding modules even when they are changed"
   (require 'org-roam-protocol)
   (setq org-roam-completion-everywhere t)
 
-
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "on" 'org-noter)
 
   ;; Use pdf-tools and no external apps
