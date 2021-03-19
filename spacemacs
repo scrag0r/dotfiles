@@ -606,7 +606,7 @@ before packages are loaded."
         )
 
   (spacemacs/set-leader-keys-for-major-mode 'latex-mode "oc"
-    'org-ref-helm-insert-cite-link)
+                                            'org-ref-helm-insert-cite-link)
 
   ;; update document buffer after compilation
   (add-hook 'TeX-after-compilation-finished-functions
